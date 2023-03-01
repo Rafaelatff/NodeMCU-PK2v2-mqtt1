@@ -41,6 +41,8 @@ And we will add the condition for ON and OFF, and the color for both conditions:
 
 ![image](https://user-images.githubusercontent.com/58916022/221731801-758943ca-9f33-4ca0-80d0-cee321c79811.png)
 
+## Code
+
 To get the credencials, just click on the key simbol and copy the Arduino lines:
 
 ![image](https://user-images.githubusercontent.com/58916022/221730721-5d9f7d82-ca9b-4ace-ab3c-e60a94d6d6ac.png)
@@ -49,3 +51,102 @@ To get the credencials, just click on the key simbol and copy the Arduino lines:
 #define IO_USERNAME  "rafaelatff"
 #define IO_KEY       "aio_ldNH891Nwiwcw2IaiJPyYfhdvaEo"
 ```
+Then install de adafruit lib for arduino:
+
+![image](https://user-images.githubusercontent.com/58916022/222023860-c0e8c6ec-54d5-4490-b8f6-c9f3585c92da.png)
+
+The Adafruit MQTT lib will also be installed together:
+
+![image](https://user-images.githubusercontent.com/58916022/222024069-fe9ac340-9b0a-4145-82d5-dec581e73792.png)
+
+Then, we add the lib and some macros:
+
+```c
+#include "AdafruitIO_WiFi.h"
+
+#define WIFI_SSID "CYBERDYNE"
+#define WIFI_PASS "password here"
+
+AdafruitIO_WiFi io(IO_USERNAME, IO_KEY, WIFI_SSID, WIFI_PASS);
+#define greenLED D4
+
+// Topic configuration "rafaelatff/feeds/greenLED"
+AdafruitIO_Feed *feed_greenLED = io.feed("greenLED");
+```
+
+In 'setup ()' we configure serial, WiFi coonection, things (greenLED) and we call:
+
+```c
+brokerConnection();
+```
+
+This function brokerConnection() may need connection later, that is why we kept as a function.
+
+```c
+void brokerConnection(){
+  Serial.print("Connecting to Adafruit IO");
+
+  // Call the connection to io.adafruit.com
+  io.connect();
+
+  // call a handler to receibe the message of the greenLED
+  feed_greenLED->onMessage(handle_greenLED);
+
+  // Wait for connection to be completed
+  while(io.status() < AIO_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+
+  // Connected
+  Serial.println('\r');
+  Serial.println(io.statusText());
+
+  // Update feed status
+  feed_greenLED->get();
+}
+```
+
+Then, in 'loop()'we just:
+
+```c
+void loop() {
+  // put your main code here, to run repeatedly:
+  // check message
+  byte state = io.run();
+
+  // check connection
+  if(state == AIO_NET_DISCONNECTED | state == AIO_DISCONNECTED){
+    brokerConnection(); // if disconnected, connect again
+  }
+}
+```
+
+All this code will call a handler function, so here it is:
+
+```c
+// Handler for the greenLED
+void handle_greenLED(AdafruitIO_Data *data) {
+
+  // Message
+  Serial.print("Data  <- ");
+  Serial.print(data->feedName());
+  Serial.print(" : ");
+  Serial.println(data->value());
+
+  // Write greenLED output
+  if(data->isTrue()) digitalWrite(greenLED, HIGH);
+  else digitalWrite(greenLED, LOW);
+}
+```
+
+## First results
+
+The serial monitor showed the following information:
+
+![image](https://user-images.githubusercontent.com/58916022/222031663-4836b9dd-e4af-4fb3-9570-92b94b48f2b8.png)
+
+And then <3 :
+
+![WhatsApp Video 2023-02-28 at 23 53 38](https://user-images.githubusercontent.com/58916022/222033546-28acb1f9-c7d9-428a-b5d2-b49191ae1f20.gif)
+
