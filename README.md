@@ -150,3 +150,19 @@ And then <3 :
 
 ![WhatsApp Video 2023-02-28 at 23 53 38](https://user-images.githubusercontent.com/58916022/222033546-28acb1f9-c7d9-428a-b5d2-b49191ae1f20.gif)
 
+## Configuring MQTT Dash
+
+Download the MQTT Dash app on playstore. Then open the app, and make the configuration above:
+
+![image](https://user-images.githubusercontent.com/58916022/222305863-b2334388-21fa-49fd-97a2-222b1f62bb29.png)
+
+Then add a new Feed (the green LED):
+
+![image](https://user-images.githubusercontent.com/58916022/222307861-16191a65-9b73-40a8-a65f-6561ba649f05.png)
+
+## Results on MQTT Dash
+
+To check the results, I connected NodeMCU on computer, and using the io.adafruit.com website I change the status of the green LED. I was able to visualize the results on my smartphone screen, according with the status of the green LED on PK2v2 board.
+
+![image](https://user-images.githubusercontent.com/58916022/222308479-6380702e-e0bd-4567-8d5b-43a7068a409b.png)
+
